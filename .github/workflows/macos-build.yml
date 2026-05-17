@@ -1,0 +1,35 @@
+name: MacOS Build compiler
+
+on:
+  push:
+    branches:
+      - main  # Əgər ana qovluğun adı 'master'-dirsə, bura master yaz
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+    - name: Kodlari servere cek
+      uses: actions/checkout@v4
+
+    - name: Python Qurulmasi
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Lazimli Kitabxanalari Yukle
+      run: |
+        python -m pip install --upgrade pip
+        pip install PyQt6 PyQt6-WebEngine pyinstaller
+
+    - name: Mac ucun Proqrami Paketle (.app yarat)
+      run: |
+        pyinstaller --noconsole --onefile --name="CrownBrowser" gemini-code.html
+        # Qeyd: Əgər əsas kod faylının adı index.html-dirsə, yuxarıdakı gemini-code.html yazısını index.html et!
+
+    - name: Hazir Fayli Yadda Saxla (Artifact)
+      uses: actions/upload-artifact@v4
+      with:
+        name: CrownBrowser-Mac
+        path: dist/CrownBrowser.app
